@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>READING WIDTH</title>
+
+  <style>
+
+    /* =====================================================
+       BASIC
+    ===================================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #eeeeec;
+      --ink: #111111;
+      --soft: #a8a8a4;
+      --accent: #ff3d87;
+
+      --font:
+        Helvetica,
+        Arial,
+        sans-serif;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+
+      background: var(--bg);
+      color: var(--ink);
+
+      font-family: var(--font);
+    }
+
+    body {
+      padding-bottom: 80px;
+    }
+
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+
+    header {
+      height: 64px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 28px;
+
+      border-bottom: 1px solid #bbb;
+    }
+
+    .logo {
+      font-size: 14px;
+      letter-spacing: 0.1em;
+    }
+
+    .description {
+      font-size: 11px;
+      color: #777;
+    }
+
+
+    /* =====================================================
+       INPUT
+    ===================================================== */
+
+    .input-section {
+      padding:
+        40px
+        40px
+        30px
+        220px;
+
+      border-bottom: 1px solid #ccc;
+    }
+
+    textarea {
+      width: min(900px, 100%);
+      height: 130px;
+
+      border: none;
+      border-bottom: 1px solid #111;
+
+      background: transparent;
+
+      resize: none;
+      outline: none;
+
+      font-family: var(--font);
+      font-size: 22px;
+
+      line-height: 1.35;
+
+      padding: 0 0 12px 0;
+    }
+
+    .input-controls {
+      margin-top: 16px;
+
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      background: transparent;
+
+      border: 1px solid #111;
+
+      padding: 9px 14px;
+
+      font-family: var(--font);
+      font-size: 10px;
+
+      letter-spacing: 0.08em;
+
+      cursor: pointer;
+
+      transition:
+        background 0.2s ease,
+        color 0.2s ease;
+    }
+
+    button:hover {
+      background: #111;
+      color: var(--bg);
+    }
+
+
+    /* =====================================================
+       VISUALIZATION AREA
+    ===================================================== */
+
+    .analysis {
+      position: relative;
+
+      padding:
+        55px
+        60px
+        80px
+        220px;
+
+      min-height: 500px;
+    }
+
+
+    /* =====================================================
+       RULER
+    ===================================================== */
+
+    .ruler {
+      position: relative;
+
+      width: min(1000px, calc(100vw - 280px));
+
+      height: 55px;
+
+      margin-bottom: 30px;
+    }
+
+    .ruler-line {
+      position: absolute;
+
+      top: 30px;
+      left: 0;
+
+      width: 100%;
+      height: 1px;
+
+      background: #bbb;
+    }
+
+    .mark {
+      position: absolute;
+
+      top: 0;
+
+      font-size: 12px;
+      color: #888;
+
+      transform: translateX(-50%);
+    }
+
+    .mark::after {
+      content: "";
+
+      position: absolute;
+
+      top: 25px;
+      left: 50%;
+
+      width: 1px;
+      height: 22px;
+
+      background: #aaa;
+    }
+
+    .mark-0 {
+      left: 0%;
+    }
+
+    .mark-30 {
+      left: 33.33%;
+    }
+
+    .mark-40 {
+      left: 44.44%;
+      color: var(--accent);
+    }
+
+    .mark-60 {
+      left: 66.66%;
+      color: var(--accent);
+    }
+
+    .mark-90 {
+      left: 100%;
+    }
+
+    .mark-40::after,
+    .mark-60::after {
+      background: var(--accent);
+    }
+
+
+    /* =====================================================
+       IDEAL RANGE
+    ===================================================== */
+
+    .ideal-range {
+      position: absolute;
+
+      top: 0;
+
+      left: 44.44%;
+
+      width: 22.22%;
+
+      height: 100%;
+
+      background:
+        rgba(
+          255,
+          61,
+          135,
+          0.08
+        );
+
+      border-left:
+        1px solid var(--accent);
+
+      border-right:
+        1px solid var(--accent);
+
+      pointer-events: none;
+    }
+
+
+    /* =====================================================
+       SENTENCES
+    ===================================================== */
+
+    .sentence-list {
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 34px;
+
+      position: relative;
+    }
+
+    .sentence-row {
+      position: relative;
+
+      display: flex;
+
+      align-items: flex-start;
+
+      min-height: 45px;
+    }
+
+
+    /* 왼쪽 난이도 */
+
+    .difficulty {
+      position: absolute;
+
+      left: -160px;
+      top: 5px;
+
+      width: 130px;
+
+      font-size: 11px;
+
+      text-align: right;
+
+      color: #777;
+    }
+
+
+    /* 실제 문장 */
+
+    .sentence {
+      font-size: 25px;
+
+      line-height: 1.28;
+
+      letter-spacing: -0.02em;
+
+      transition:
+        width 0.5s
+        cubic-bezier(
+          0.22,
+          1,
+          0.36,
+          1
+        );
+
+      overflow-wrap: break-word;
+    }
+
+
+    /* =====================================================
+       READABILITY DOT
+    ===================================================== */
+
+    .score {
+      margin-left: 14px;
+      margin-top: 9px;
+
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: #111;
+
+      opacity: 0.25;
+
+      flex-shrink: 0;
+    }
+
+
+    /* =====================================================
+       GUIDE
+    ===================================================== */
+
+    .guide {
+      position: absolute;
+
+      top: 55px;
+      left: 220px;
+
+      width: min(
+        1000px,
+        calc(100vw - 280px)
+      );
+
+      height:
+        calc(100% - 100px);
+
+      pointer-events: none;
+
+      z-index: 0;
+    }
+
+    .guide-line {
+      position: absolute;
+
+      top: 55px;
+      bottom: 0;
+
+      width: 1px;
+
+      background: rgba(0,0,0,0.08);
+    }
+
+    .guide-30 {
+      left: 33.33%;
+    }
+
+    .guide-40 {
+      left: 44.44%;
+
+      background:
+        rgba(
+          255,
+          61,
+          135,
+          0.25
+        );
+    }
+
+    .guide-60 {
+      left: 66.66%;
+
+      background:
+        rgba(
+          255,
+          61,
+          135,
+          0.25
+        );
+    }
+
+    .guide-90 {
+      left: 100%;
+    }
+
+    .ideal-column {
+      position: absolute;
+
+      top: 55px;
+      bottom: 0;
+
+      left: 44.44%;
+
+      width: 22.22%;
+
+      background:
+        rgba(
+          255,
+          61,
+          135,
+          0.035
+        );
+    }
+
+
+    .sentence-list,
+    .ruler {
+      z-index: 2;
+    }
+
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+
+    footer {
+      padding:
+        0
+        30px;
+
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      font-size: 10px;
+
+      color: #888;
+    }
+
+
+    /* =====================================================
+       MOBILE
+    ===================================================== */
+
+    @media (
+      max-width: 800px
+    ) {
+
+      .input-section,
+      .analysis {
+        padding-left: 25px;
+        padding-right: 25px;
+      }
+
+      .guide {
+        left: 25px;
+
+        width:
+          calc(100vw - 50px);
+      }
+
+      .ruler {
+        width:
+          calc(100vw - 50px);
+      }
+
+      .difficulty {
+        display: none;
+      }
+
+      .sentence {
+        font-size: 21px;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+
+<body>
+
+
+  <!-- ================================================
+       HEADER
+  ================================================= -->
+
+  <header>
+
+    <div class="logo">
+      READING WIDTH
+    </div>
+
+    <div class="description">
+      TEXT EXPANDS AS READING BECOMES HARDER
+    </div>
+
+  </header>
+
+
+
+  <!-- ================================================
+       INPUT
+  ================================================= -->
+
+  <section
+    class="input-section"
+  >
+
+    <textarea
+      id="textInput"
+      spellcheck="false"
+    >Tokyo is a busy city. It mixes modern buildings with traditional temples. Extraordinary architectural complexity can occasionally make urban environments considerably more difficult to understand. People still find their way through the city.</textarea>
+
+
+    <div
+      class="input-controls"
+    >
+
+      <button
+        id="analyzeButton"
+      >
+        ANALYZE
+      </button>
+
+
+      <button
+        id="clearButton"
+      >
+        CLEAR
+      </button>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- ================================================
+       ANALYSIS
+  ================================================= -->
+
+  <main
+    class="analysis"
+  >
+
+
+    <!-- guide background -->
+
+    <div
+      class="guide"
+    >
+
+      <div
+        class="ideal-column"
+      ></div>
+
+      <div
+        class="
+          guide-line
+          guide-30
+        "
+      ></div>
+
+      <div
+        class="
+          guide-line
+          guide-40
+        "
+      ></div>
+
+      <div
+        class="
+          guide-line
+          guide-60
+        "
+      ></div>
+
+      <div
+        class="
+          guide-line
+          guide-90
+        "
+      ></div>
+
+    </div>
+
+
+
+    <!-- ruler -->
+
+    <div
+      class="ruler"
+    >
+
+      <div
+        class="ideal-range"
+      ></div>
+
+
+      <div
+        class="ruler-line"
+      ></div>
+
+
+      <div
+        class="
+          mark
+          mark-0
+        "
+      >
+        0
+      </div>
+
+
+      <div
+        class="
+          mark
+          mark-30
+        "
+      >
+        30
+      </div>
+
+
+      <div
+        class="
+          mark
+          mark-40
+        "
+      >
+        40
+      </div>
+
+
+      <div
+        class="
+          mark
+          mark-60
+        "
+      >
+        60
+      </div>
+
+
+      <div
+        class="
+          mark
+          mark-90
+        "
+      >
+        90
+      </div>
+
+    </div>
+
+
+
+    <!-- generated sentences -->
+
+    <div
+      class="sentence-list"
+      id="sentenceList"
+    ></div>
+
+  </main>
+
+
+
+  <footer>
+
+    <span>
+      IDEAL READING RANGE: 40–60 CHARACTERS
+    </span>
+
+    <span>
+      MADE BY APPLESOAP
+    </span>
+
+  </footer>
+
+
+
+  <script>
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const textInput =
+      document.querySelector(
+        "#textInput"
+      );
+
+
+    const analyzeButton =
+      document.querySelector(
+        "#analyzeButton"
+      );
+
+
+    const clearButton =
+      document.querySelector(
+        "#clearButton"
+      );
+
+
+    const sentenceList =
+      document.querySelector(
+        "#sentenceList"
+      );
+
+
+
+    /* =====================================================
+       SPLIT TEXT INTO SENTENCES
+    ===================================================== */
+
+    function splitSentences(text) {
+
+
+      /*
+        . ! ? 를 기준으로
+        문장을 나눕니다.
+      */
+
+
+      const result =
+        text.match(
+          /[^.!?]+[.!?]+|[^.!?]+$/g
+        );
+
+
+      if (!result) {
+        return [];
+      }
+
+
+      return result
+        .map(
+          sentence =>
+            sentence.trim()
+        )
+        .filter(
+          sentence =>
+            sentence.length > 0
+        );
+
+    }
+
+
+
+    /* =====================================================
+       READABILITY CALCULATION
+    ===================================================== */
+
+    function analyzeReadability(
+      sentence
+    ) {
+
+
+      const words =
+        sentence
+          .replace(
+            /[^A-Za-z\s'-]/g,
+            ""
+          )
+          .split(/\s+/)
+          .filter(Boolean);
+
+
+
+      if (
+        words.length === 0
+      ) {
+
+        return 0;
+
+      }
+
+
+
+      /*
+        평균 단어 길이
+      */
+
+      const totalLetters =
+        words.reduce(
+
+          (
+            sum,
+            word
+          ) =>
+
+            sum
+            +
+            word.length,
+
+          0
+
+        );
+
+
+      const averageWordLength =
+        totalLetters
+        /
+        words.length;
+
+
+
+      /*
+        문장 내 단어 수
+      */
+
+      const sentenceLength =
+        words.length;
+
+
+
+      /*
+        긴 단어 개수
+
+        8글자 이상이면
+        조금 복잡한 단어라고 간주
+      */
+
+      const longWords =
+        words.filter(
+
+          word =>
+            word.length >= 8
+
+        ).length;
+
+
+
+      /*
+        READABILITY DIFFICULTY SCORE
+
+        0 ~ 100
+
+        숫자가 높을수록
+        읽기 어려움
+      */
+
+      let score =
+
+        (
+          averageWordLength
+          -
+          3
+        )
+        *
+        11
+
+        +
+
+        sentenceLength
+        *
+        1.4
+
+        +
+
+        longWords
+        *
+        5;
+
+
+
+      score =
+        Math.max(
+          0,
+          Math.min(
+            score,
+            100
+          )
+        );
+
+
+      return score;
+
+    }
+
+
+
+    /* =====================================================
+       SCORE → WIDTH
+    ===================================================== */
+
+    function scoreToWidth(
+      score
+    ) {
+
+
+      /*
+        쉽게 읽히는 문장:
+
+        약 45~55ch
+
+
+        읽기 어려운 문장:
+
+        최대 90ch
+
+
+        difficulty가 올라갈수록
+        일부러 더 길게 늘어남.
+      */
+
+
+      const minimum =
+        46;
+
+
+      const maximum =
+        90;
+
+
+      const width =
+
+        minimum
+
+        +
+
+        (
+          score
+          /
+          100
+        )
+
+        *
+        (
+          maximum
+          -
+          minimum
+        );
+
+
+      return width;
+
+    }
+
+
+
+    /* =====================================================
+       SCORE LABEL
+    ===================================================== */
+
+    function scoreLabel(
+      score
+    ) {
+
+
+      if (
+        score < 25
+      ) {
+
+        return "EASY";
+
+      }
+
+
+      if (
+        score < 50
+      ) {
+
+        return "COMFORTABLE";
+
+      }
+
+
+      if (
+        score < 75
+      ) {
+
+        return "DENSE";
+
+      }
+
+
+      return "DIFFICULT";
+
+    }
+
+
+
+    /* =====================================================
+       RENDER
+    ===================================================== */
+
+    function renderAnalysis() {
+
+
+      sentenceList.innerHTML =
+        "";
+
+
+      const sentences =
+        splitSentences(
+          textInput.value
+        );
+
+
+
+      sentences.forEach(
+
+        sentence => {
+
+
+          const score =
+            analyzeReadability(
+              sentence
+            );
+
+
+          const width =
+            scoreToWidth(
+              score
+            );
+
+
+          /*
+            전체 row
+          */
+
+          const row =
+            document.createElement(
+              "div"
+            );
+
+
+          row.className =
+            "sentence-row";
+
+
+
+          /*
+            difficulty label
+          */
+
+          const label =
+            document.createElement(
+              "div"
+            );
+
+
+          label.className =
+            "difficulty";
+
+
+          label.textContent =
+
+            `${scoreLabel(score)} ${Math.round(score)}`;
+
+
+
+          /*
+            sentence
+          */
+
+          const text =
+            document.createElement(
+              "div"
+            );
+
+
+          text.className =
+            "sentence";
+
+
+          text.textContent =
+            sentence;
+
+
+
+          /*
+            핵심:
+
+            readability score에 따라
+            문장 폭 변경
+          */
+
+          text.style.width =
+            `${width}ch`;
+
+
+
+          /*
+            score dot
+          */
+
+          const dot =
+            document.createElement(
+              "div"
+            );
+
+
+          dot.className =
+            "score";
+
+
+          dot.style.opacity =
+            0.15
+            +
+            (
+              score
+              /
+              100
+            )
+            *
+            0.65;
+
+
+
+          /*
+            append
+          */
+
+          row.appendChild(
+            label
+          );
+
+
+          row.appendChild(
+            text
+          );
+
+
+          row.appendChild(
+            dot
+          );
+
+
+          sentenceList.appendChild(
+            row
+          );
+
+      });
+
+    }
+
+
+
+    /* =====================================================
+       ANALYZE BUTTON
+    ===================================================== */
+
+    analyzeButton
+      .addEventListener(
+
+        "click",
+
+        renderAnalysis
+
+      );
+
+
+
+    /* =====================================================
+       LIVE UPDATE
+    ===================================================== */
+
+    /*
+      타이핑할 때도
+      실시간으로 변화합니다.
+    */
+
+    textInput
+      .addEventListener(
+
+        "input",
+
+        renderAnalysis
+
+      );
+
+
+
+    /* =====================================================
+       CLEAR
+    ===================================================== */
+
+    clearButton
+      .addEventListener(
+
+        "click",
+
+        () => {
+
+
+          textInput.value =
+            "";
+
+
+          renderAnalysis();
+
+
+          textInput.focus();
+
+        }
+
+      );
+
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    renderAnalysis();
+
+
+  </script>
+
+
+</body>
+
+</html>
